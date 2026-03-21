@@ -18,7 +18,7 @@ async def upload_file(file: UploadFile=File(...)):
         raise HTTPException(status_code=400, detail="File too large. Maximum size is 10MB")
   
   try:
-      df = pd.read_csv(io.BytesIO(content))
+      df = pd.read_csv(io.BytesIO(content), na_values=['?', 'NA', 'N/A', 'na', 'n/a', ''])
   except Exception:
       raise HTTPException(status_code=400, detail="Could not parse CSV. Check the file format")
 
