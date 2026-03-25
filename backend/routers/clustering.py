@@ -15,7 +15,7 @@ async def clusters(request: SessionRequest):
   if session_id not in session_store:
     raise HTTPException(status_code=400, detail="session code not found")
   
-  df = session_store[session_id]
+  df = session_store[session_id]["df"]
   
   try:
       return get_clusters(df)
