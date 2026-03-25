@@ -23,7 +23,9 @@ async def upload_file(file: UploadFile=File(...)):
       raise HTTPException(status_code=400, detail="Could not parse CSV. Check the file format")
 
   rows, cols = df.shape
-  session_store[session_id] = df
+  session_store[session_id] = {
+      "df": df
+  }
 
   return {
       "filename": file.filename,
