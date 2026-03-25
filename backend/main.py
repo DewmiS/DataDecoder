@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 import os
-from backend.routers import upload, profile, correlation, clustering
+from backend.routers import upload, profile, correlation, clustering, explain
 
 load_dotenv()
 
@@ -23,3 +23,4 @@ app.include_router(upload.router, prefix="/api")
 app.include_router(profile.router, prefix="/api")
 app.include_router(correlation.router, prefix="/api")
 app.include_router(clustering.router, prefix="/api")
+app.include_router(explain.router, prefix="/api")
