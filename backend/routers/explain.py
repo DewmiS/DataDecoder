@@ -22,6 +22,59 @@ class SessionRequest(BaseModel):
   session_id: str
   target: str
 
+def generate_pdf(text, file_path):
+  doc = SimpleDocTemplate(file_path)
+  styles = getSampleStyleSheet()
+
+  title_style = ParagraphStyle(
+      name="Title",
+      parent=styles["Heading1"],
+      alignment=TA_CENTER,
+      spaceAfter=20
+  )
+
+  heading_style = ParagraphStyle(
+    name="Heading",
+    parent=styles["Heading2"],
+    spaceBefore=20,
+    spaceAfter=12
+  )
+
+  normal_style = styles["Normal"]
+
+  content = []
+
+  lines = text.split("\n")
+
+  for line in lines:
+    line = line.strip()
+    line = line.replace("**", "")
+    line = line.replace("##", "")
+
+    if not line:
+        content.append(Spacer(1, 10))
+        continue
+
+    if "data analysis report" in line.lower():
+        content.append(Paragraph(line, title_style))
+
+    elif line.startswith("#"):
+        clean = line.replace("#", "").strip()
+        content.append(Paragraph(clean, heading_style))
+
+    elif line[0].isdigit() and "." in line:
+        title = line.split(".", 1)[1].strip().upper()
+        content.append(Paragraph(title, heading_style))
+
+    elif line.startswith("*") or line.startswith("-") or line.startswith("•"):
+        bullet = line.replace("*", "").replace("-", "").replace("•", "").strip()
+        content.append(Paragraph(f"• {bullet}", normal_style))
+
+    else:
+        content.append(Paragraph(line, normal_style))
+
+  doc.build(content)
+
 @router.post("/explain")
 async def explain(request: SessionRequest):
   session_id = request.session_id
@@ -30,7 +83,7 @@ async def explain(request: SessionRequest):
   if session_id not in session_store:
     raise HTTPException(status_code=400, detail="session code not found")
   
-  df = session_store[session_id]
+  df = session_store[session_id]["df"]
   profile = run_profile(df)
   correlation = get_correlation(df, target)
   try:
@@ -106,71 +159,43 @@ async def explain(request: SessionRequest):
 
       result = response.json()
 
-      ai_response_text = result["choices"][0]["message"]["content"]
+      if "choices" in result:
+          ai_response_text = result["choices"][0]["message"]["content"]
+      else:
+          ai_response_text = "AI unavailable. Try again later."
+      session_store[session_id]["summary"] = summary
+      session_store[session_id]["explanation"] = ai_response_text
       
   except Exception as e:
       ai_response_text = f"AI explanation failed: {str(e)}"
 
-  def generate_pdf(text, file_path):
-    doc = SimpleDocTemplate(file_path)
-    styles = getSampleStyleSheet()
-
-    title_style = ParagraphStyle(
-        name="Title",
-        parent=styles["Heading1"],
-        alignment=TA_CENTER,
-        spaceAfter=20
-    )
-
-    heading_style = ParagraphStyle(
-      name="Heading",
-      parent=styles["Heading2"],
-      spaceBefore=20,
-      spaceAfter=12
-  )
-
-    normal_style = styles["Normal"]
-
-    content = []
-
-    lines = text.split("\n")
-
-    for line in lines:
-      line = line.strip()
-      line = line.replace("**", "")
-      line = line.replace("##", "")
-
-      if not line:
-          content.append(Spacer(1, 10))
-          continue
-
-      if "data analysis report" in line.lower():
-          content.append(Paragraph(line, title_style))
-
-      elif line.startswith("#"):
-          clean = line.replace("#", "").strip()
-          content.append(Paragraph(clean, heading_style))
-
-      elif line[0].isdigit() and "." in line:
-          title = line.split(".", 1)[1].strip().upper()
-          content.append(Paragraph(title, heading_style))
-
-      elif line.startswith("*") or line.startswith("-") or line.startswith("•"):
-          bullet = line.replace("*", "").replace("-", "").replace("•", "").strip()
-          content.append(Paragraph(f"• {bullet}", normal_style))
-
-      else:
-          content.append(Paragraph(line, normal_style))
-
-    doc.build(content)
-
-  pdf_path = f"report_{session_id}.pdf"
-  generate_pdf(ai_response_text, pdf_path)
-
   print(result)
     
-  return FileResponse(
-    path=pdf_path,
-    filename="report.pdf",
-    media_type="application/pdf"
-)
+  return {
+    "summary": summary,
+    "explanation": ai_response_text
+}
+
+
+@router.post("/report")
+async def generate_report(request: SessionRequest):
+    session_id = request.session_id
+
+    if session_id not in session_store:
+        raise HTTPException(status_code=400, detail="session not found")
+
+    data = session_store[session_id]
+
+    ai_text = data.get("explanation")
+
+    if not ai_text:
+        raise HTTPException(status_code=400, detail="Run /explain first")
+
+    pdf_path = f"report_{session_id}.pdf"
+    generate_pdf(ai_text, pdf_path)
+
+    return FileResponse(
+        path=pdf_path,
+        filename="report.pdf",
+        media_type="application/pdf"
+    )
