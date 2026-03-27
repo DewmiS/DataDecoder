@@ -99,6 +99,16 @@ async def explain(request: SessionRequest):
     "clusters": clusters
   }
 
+  cluster_text = ""
+
+  if clusters:
+      cluster_text = f"""
+        Cluster Analysis:
+        {clusters}
+        """
+  else:
+      cluster_text = "Cluster analysis was not applicable for this dataset."
+
   features_text = "\n".join(
       [f"- {k}: {v}" for k, v in summary["top_features"].items()]
   )
@@ -127,7 +137,7 @@ async def explain(request: SessionRequest):
   {features_text}
 
   Cluster Summary:
-  {summary['clusters']}
+  {cluster_text}
 
   Instructions:
   - Do NOT write conversational phrases
@@ -135,6 +145,7 @@ async def explain(request: SessionRequest):
   - Write in formal report style
   - Use headings and bullet points where appropriate
   - Keep it professional and concise
+  - If clustering is not available, skip cluster analysis and focus on other insights.
   """
   
   api_key = os.getenv("OPENROUTER_API_KEY")
