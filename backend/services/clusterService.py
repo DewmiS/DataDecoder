@@ -16,7 +16,16 @@ def get_clusters(df):
   df_numeric = df_processed.select_dtypes(include="number")
 
   if df_numeric.shape[1] < 2:
-    raise ValueError("Not enough valid columns for clustering")
+      return {
+          "status": "skipped",
+          "reason": "Not enough numeric columns for clustering"
+      }
+
+  if df_numeric.var().mean() < 1e-3:
+      return {
+          "status": "skipped",
+          "reason": "Data has very low variance (no meaningful clusters)"
+      }
   
   scaler = StandardScaler()
   scaled = scaler.fit_transform(df_numeric)
@@ -33,6 +42,12 @@ def get_clusters(df):
     
   best_k = drops.index(max(drops)) + 2
 
+  if max(drops) < 0.1:
+      return {
+          "status": "skipped",
+          "reason": "No strong cluster separation found"
+      }
+
   km = KMeans(n_clusters=best_k, random_state=42)
   km.fit(scaled)
   df_numeric["cluster"] = km.labels_
@@ -43,6 +58,7 @@ def get_clusters(df):
   }
   
   return{
+    "status": "success",
     "best k" : best_k,
     "cluster_summary" : cluster_summary.to_dict(),
     "cluster_sizes": cluster_sizes
