@@ -7,8 +7,6 @@ from backend.services.clusterService import get_clusters
 import requests
 import os
 from dotenv import load_dotenv
-from reportlab.platypus import SimpleDocTemplate, Paragraph
-from reportlab.lib.styles import getSampleStyleSheet
 from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.enums import TA_CENTER
@@ -19,173 +17,253 @@ load_dotenv()
 router = APIRouter()
 
 class SessionRequest(BaseModel):
-  session_id: str
-  target: str
+    session_id: str
+    target: str | None = None
+
 
 def generate_pdf(text, file_path):
-  doc = SimpleDocTemplate(file_path)
-  styles = getSampleStyleSheet()
+    doc = SimpleDocTemplate(file_path)
+    styles = getSampleStyleSheet()
 
-  title_style = ParagraphStyle(
-      name="Title",
-      parent=styles["Heading1"],
-      alignment=TA_CENTER,
-      spaceAfter=20
-  )
+    title_style = ParagraphStyle(
+        name="Title",
+        parent=styles["Heading1"],
+        alignment=TA_CENTER,
+        spaceAfter=20
+    )
 
-  heading_style = ParagraphStyle(
-    name="Heading",
-    parent=styles["Heading2"],
-    spaceBefore=20,
-    spaceAfter=12
-  )
+    heading_style = ParagraphStyle(
+        name="Heading",
+        parent=styles["Heading2"],
+        spaceBefore=20,
+        spaceAfter=12
+    )
 
-  normal_style = styles["Normal"]
+    normal_style = styles["Normal"]
+    content = []
 
-  content = []
+    lines = text.split("\n")
 
-  lines = text.split("\n")
+    for line in lines:
+        line = line.strip()
+        line = line.replace("**", "").replace("##", "")
 
-  for line in lines:
-    line = line.strip()
-    line = line.replace("**", "")
-    line = line.replace("##", "")
+        if not line:
+            content.append(Spacer(1, 10))
+            continue
 
-    if not line:
-        content.append(Spacer(1, 10))
-        continue
+        if "data analysis report" in line.lower():
+            content.append(Paragraph(line, title_style))
 
-    if "data analysis report" in line.lower():
-        content.append(Paragraph(line, title_style))
+        elif line.startswith("#"):
+            clean = line.replace("#", "").strip()
+            content.append(Paragraph(clean, heading_style))
 
-    elif line.startswith("#"):
-        clean = line.replace("#", "").strip()
-        content.append(Paragraph(clean, heading_style))
+        elif line and line[0].isdigit() and "." in line:
+            title = line.split(".", 1)[1].strip().upper()
+            content.append(Paragraph(title, heading_style))
 
-    elif line[0].isdigit() and "." in line:
-        title = line.split(".", 1)[1].strip().upper()
-        content.append(Paragraph(title, heading_style))
+        elif line.startswith("*") or line.startswith("-") or line.startswith("•"):
+            bullet = line.replace("*", "").replace("-", "").replace("•", "").strip()
+            content.append(Paragraph(f"• {bullet}", normal_style))
 
-    elif line.startswith("*") or line.startswith("-") or line.startswith("•"):
-        bullet = line.replace("*", "").replace("-", "").replace("•", "").strip()
-        content.append(Paragraph(f"• {bullet}", normal_style))
+        else:
+            content.append(Paragraph(line, normal_style))
 
-    else:
-        content.append(Paragraph(line, normal_style))
+    doc.build(content)
 
-  doc.build(content)
 
 @router.post("/explain")
 async def explain(request: SessionRequest):
-  session_id = request.session_id
-  target = request.target
+    session_id = request.session_id
+    target = request.target
 
-  if session_id not in session_store:
-    raise HTTPException(status_code=400, detail="session code not found")
-  
-  df = session_store[session_id]["df"]
-  profile = run_profile(df)
-  correlation = get_correlation(df, target)
-  try:
-      clusters = get_clusters(df)
-  except:
-      clusters = None
+    if session_id not in session_store:
+        raise HTTPException(status_code=400, detail="session code not found")
 
-  summary = {
-    "rows": profile["rows"],
-    "columns": profile["columns"],
-    "numeric_columns": profile["numeric_column_count"],
-    "top_features": correlation["feature_importance"],
-    "clusters": clusters
-  }
+    df = session_store[session_id]["df"]
 
-  cluster_text = ""
+    if target and target in df.columns:
+        mode = "ml"
+    else:
+        mode = "eda"
 
-  if clusters:
-      cluster_text = f"""
-        Cluster Analysis:
-        {clusters}
-        """
-  else:
-      cluster_text = "Cluster analysis was not applicable for this dataset."
+    profile = run_profile(df)
 
-  features_text = "\n".join(
-      [f"- {k}: {v}" for k, v in summary["top_features"].items()]
-  )
+    if mode == "ml":
+        correlation = get_correlation(df, target)
+        top_features = correlation["feature_importance"]
+    else:
+        correlation = None
+        top_features = {}
 
-  prompt = f"""
-  You are a professional data analyst.
+    numeric_cols = df.select_dtypes(include="number").shape[1]
 
-  Generate a structured data analysis report (not a conversation).
+    if numeric_cols >= 2:
+        try:
+            clusters_result = get_clusters(df)
+        except:
+            clusters_result = {
+                "status": "skipped",
+                "reason": "Clustering failed due to internal error"
+            }
+    else:
+        clusters_result = {
+            "status": "skipped",
+            "reason": "Not enough numeric columns for clustering"
+        }
 
-  Use clear sections with headings.
+    summary = {
+        "rows": profile["rows"],
+        "columns": profile["columns"],
+        "numeric_columns": profile["numeric_column_count"],
+        "mode": mode,
+        "target": target if mode == "ml" else None,
+        "top_features": top_features,
+        "clusters": clusters_result   
+    }
 
-  Format:
+    if clusters_result.get("status") == "success":
 
-  1. Dataset Overview
-  2. Key Features
-  3. Cluster Analysis
-  4. Key Insights
-  5. Conclusion
+      cluster_summary = clusters_result.get("cluster_summary")
 
-  Dataset:
-  - Rows: {summary['rows']}
-  - Columns: {summary['columns']}
-  - Numeric columns: {summary['numeric_columns']}
-
-  Top Features:
-  {features_text}
-
-  Cluster Summary:
-  {cluster_text}
-
-  Instructions:
-  - Do NOT write conversational phrases
-  - Do NOT say "here is" or "let's"
-  - Write in formal report style
-  - Use headings and bullet points where appropriate
-  - Keep it professional and concise
-  - If clustering is not available, skip cluster analysis and focus on other insights.
-  """
-  
-  api_key = os.getenv("OPENROUTER_API_KEY")
-
-  try:
-      response = requests.post(
-          url="https://openrouter.ai/api/v1/chat/completions",
-          headers={
-              "Authorization": f"Bearer {api_key}",
-              "Content-Type": "application/json",
-          },
-          json={
-              "model": "google/gemma-3-4b-it:free",
-              "messages": [
-                  {
-                      "role": "user",
-                      "content": prompt
-                  }
-              ]
-          }
-      )
-
-      result = response.json()
-
-      if "choices" in result:
-          ai_response_text = result["choices"][0]["message"]["content"]
+      if isinstance(cluster_summary, dict):
+          cluster_summary_text = "\n".join([
+              f"Cluster {k}: {v}"
+              for k, v in cluster_summary.items()
+          ])
       else:
-          ai_response_text = "AI unavailable. Try again later."
-      session_store[session_id]["summary"] = summary
-      session_store[session_id]["explanation"] = ai_response_text
-      
-  except Exception as e:
-      ai_response_text = f"AI explanation failed: {str(e)}"
+          cluster_summary_text = "No cluster summary available."
 
-  print(result)
-    
-  return {
-    "summary": summary,
-    "explanation": ai_response_text
-}
+      cluster_text = f"""
+Cluster Analysis:
+Best k: {clusters_result.get('best_k', 'N/A')}
+
+Cluster Sizes:
+{clusters_result['cluster_sizes']}
+
+Cluster Summary:
+{cluster_summary_text}
+"""
+    else:
+        cluster_text = f"""
+Cluster Analysis:
+Clustering was not applied.
+
+Reason:
+{clusters_result.get("reason")}
+"""
+
+    features_text = "\n".join(
+        [f"- {k}: {v}" for k, v in summary["top_features"].items()]
+    )
+
+    column_names_text = ", ".join(profile["column_name"])
+
+    column_details_text = "\n".join([
+        f"- {list(col.keys())[0]} | type: {list(col.values())[0]}"
+        for col in profile["column_details"]
+    ])
+
+    prompt = f"""
+You are a professional data analyst.
+
+Generate a structured data analysis report (not a conversation).
+
+Format:
+1. Dataset Overview
+2. Key Features (only if applicable)
+3. Cluster Analysis (only if applicable)
+4. Key Insights
+5. Conclusion
+
+Dataset:
+- Rows: {summary['rows']}
+- Columns: {summary['columns']}
+- Numeric columns: {summary['numeric_columns']}
+
+Column Names:
+{column_names_text}
+
+Column Details:
+{column_details_text}
+"""
+
+    if mode == "ml":
+        prompt += f"""
+Target Column:
+{target}
+
+Top Features:
+{features_text}
+
+Explain which features most influence the target variable.
+"""
+    else:
+        prompt += """
+No specific target column is provided.
+
+Focus on:
+- relationships between variables
+- patterns
+- general insights
+"""
+
+    if clusters_result.get("status") == "success":
+        prompt += f"""
+{cluster_text}
+"""
+    else:
+        prompt += f"""
+{cluster_text}
+"""
+
+    prompt += """
+Instructions:
+- Do NOT write conversational phrases
+- Use professional report style with simple english 
+- Explain the result like explaining to a person with no understanding of the feild
+- Use bullet points where needed
+- Always use exact column names
+- Never say "Column 1", "Column 2"
+"""
+
+    api_key = os.getenv("OPENROUTER_API_KEY")
+
+    try:
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers={
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "google/gemma-3-12b-it:free",
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ]
+            }
+        )
+
+        result = response.json()
+
+        if "choices" in result:
+            ai_response_text = result["choices"][0]["message"]["content"]
+        else:
+            ai_response_text = "AI unavailable. Try again later."
+
+        session_store[session_id]["summary"] = summary
+        session_store[session_id]["explanation"] = ai_response_text
+
+    except Exception as e:
+        ai_response_text = f"AI explanation failed: {str(e)}"
+
+    print(result if 'result' in locals() else "No response")
+
+    return {
+        "summary": summary,
+        "explanation": ai_response_text
+    }
 
 
 @router.post("/report")
