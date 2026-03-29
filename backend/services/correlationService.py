@@ -27,9 +27,26 @@ def get_correlation(df, target):
 
   if df_numeric.shape[1] < 2:
       raise ValueError("Not enough valid columns for correlation")
+  
+  # keep only numeric
+  df_numeric = df_processed.select_dtypes(include="number")
 
-  pearson_corr = df_numeric.corr().to_dict()
-  spearman_corr = df_numeric.corr(method="spearman").to_dict()
+  # remove constant columns
+  df_numeric = df_numeric.loc[:, df_numeric.nunique() > 1]
+
+  import math
+
+  def clean_nan(data):
+      if isinstance(data, dict):
+          return {k: clean_nan(v) for k, v in data.items()}
+      elif isinstance(data, list):
+          return [clean_nan(v) for v in data]
+      elif isinstance(data, float) and math.isnan(data):
+          return None
+      return data
+
+  pearson_corr = clean_nan(df_numeric.corr().to_dict())
+  spearman_corr = clean_nan(df_numeric.corr(method="spearman").to_dict())
 
   # Prepare X and y
   if not pd.api.types.is_numeric_dtype(df_processed[target]):
