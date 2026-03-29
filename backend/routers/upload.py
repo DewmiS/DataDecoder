@@ -24,7 +24,9 @@ async def upload_file(file: UploadFile=File(...)):
 
   rows, cols = df.shape
   session_store[session_id] = {
-      "df": df
+      "df": df,
+      "summary": None,
+      "explanation": None
   }
 
   return {
