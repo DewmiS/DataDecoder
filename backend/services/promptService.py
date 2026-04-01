@@ -11,6 +11,16 @@ def build_prompt(summary, profile):
         [f"- {k}: {v}" for k, v in summary["top_features"].items()]
     )
 
+    pearson_text = "\n".join([
+        f"- {a} & {b}: {round(v, 2)}"
+        for a, b, v in summary.get("top_pearson", [])
+    ])
+
+    spearman_text = "\n".join([
+        f"- {a} & {b}: {round(v, 2)}"
+        for a, b, v in summary.get("top_spearman", [])
+    ])
+
     clusters = summary["clusters"]
 
     if clusters.get("status") == "success":
@@ -61,6 +71,16 @@ Column Names:
 
 Column Details:
 {column_details}
+"""
+    
+    prompt += f"""
+Correlation Analysis:
+
+Top Pearson (linear relationships):
+{pearson_text}
+
+Top Spearman (rank relationships):
+{spearman_text}
 """
 
     if summary["mode"] == "ml":
