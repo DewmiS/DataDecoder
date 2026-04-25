@@ -1,3 +1,4 @@
+import { useState } from "react"
 import PageLayout from "../components/PageLayout"
 import { useLocation, useNavigate } from "react-router-dom"
 
@@ -11,6 +12,7 @@ function getCellColor(value) {
 export default function PatternsPage() {
   const { state } = useLocation()
   const navigate = useNavigate()
+  const [mode, setMode] = useState("pearson")
 
   const correlation = state?.results?.correlation
   const profile = state?.results?.profile
@@ -19,7 +21,8 @@ export default function PatternsPage() {
     return <div className="text-white p-10">No correlation data found</div>
   }
 
-  const columns = Object.keys(correlation.pearson)
+  const selectedMode = correlation[mode]
+  const columns = Object.keys(selectedMode)
   const featureImportance = correlation.feature_importance ?? {}
   const maxImportance = Math.max(...Object.values(featureImportance))
 
@@ -32,6 +35,22 @@ export default function PatternsPage() {
           <p className="text-xs text-gray-400 tracking-widest mb-4">
             CORRELATION HEATMAP
           </p>
+
+          <div className="inline-flex mb-4 rounded-full border border-white/15 bg-white/5 p-0.5">
+            {["pearson", "spearman"].map((m) => (
+              <button
+                key={m}
+                onClick={() => setMode(m)}
+                className={`px-4 py-1.5 text-xs rounded-full capitalize transition-all duration-200 ${
+                  mode === m
+                    ? "bg-white text-black font-semibold shadow"
+                    : "text-white/50 hover:text-white/80"
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
 
           <div className="overflow-auto">
             <table className="text-xs border-collapse">
@@ -53,7 +72,7 @@ export default function PatternsPage() {
                       {row}
                     </td>
                     {columns.map(col => {
-                      const val = correlation.pearson[row][col]
+                      const val = selectedMode[row][col]
                       return (
                         <td
                           key={col}
