@@ -12,17 +12,17 @@ def build_prompt(summary, profile):
     )
 
     clusters = summary["clusters"]
+    cluster_status = clusters.get("status")
 
-    if clusters.get("status") == "success":
+    if cluster_status == "success":
         cluster_summary = clusters.get("cluster_summary", {})
-
         cluster_summary_text = "\n".join([
             f"Cluster {k}: {v}" for k, v in cluster_summary.items()
         ])
-
         cluster_text = f"""
 Cluster Analysis:
-Best k: {clusters.get('best k')}
+Best k: {clusters.get('best_k')}
+Silhouette score: {clusters.get('silhouette_score')} (strong separation)
 
 Cluster Sizes:
 {clusters.get('cluster_sizes')}
@@ -30,6 +30,27 @@ Cluster Sizes:
 Cluster Summary:
 {cluster_summary_text}
 """
+
+    elif cluster_status == "soft":
+        # Pass the caveat directly into the prompt so the LLM hedges correctly.
+        cluster_summary = clusters.get("cluster_summary", {})
+        cluster_summary_text = "\n".join([
+            f"Cluster {k}: {v}" for k, v in cluster_summary.items()
+        ])
+        cluster_text = f"""
+Cluster Analysis:
+Best k: {clusters.get('best_k')}
+Silhouette score: {clusters.get('silhouette_score')} (weak separation — soft groupings only)
+
+Important caveat: {clusters.get('caveat')}
+
+Cluster Sizes:
+{clusters.get('cluster_sizes')}
+
+Cluster Summary:
+{cluster_summary_text}
+"""
+
     else:
         cluster_text = f"""
 Cluster Analysis:
@@ -63,6 +84,16 @@ Column Details:
 {column_details}
 """
 
+    prompt += f"""
+Correlation Analysis:
+
+Top Pearson (linear relationships):
+{pearson_text}
+
+Top Spearman (rank relationships):
+{spearman_text}
+"""
+
     if summary["mode"] == "ml":
         prompt += f"""
 Target Column:
@@ -86,6 +117,7 @@ Instructions:
 - No conversational text
 - Use bullet points
 - Use real column names
+- For soft/weak cluster results, describe groups as tendencies or broad patterns, not hard segments
 """
 
     return prompt
