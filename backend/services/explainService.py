@@ -32,21 +32,12 @@ def run_explain(session_id, target):
         pearson = correlation.get("pearson", {})
         spearman = correlation.get("spearman", {})
 
-    numeric_cols = df.select_dtypes(include="number").shape[1]
-
-    if numeric_cols >= 2:
-        try:
-            clusters = get_clusters(df)
-            clusters["status"] = "success"
-        except:
-            clusters = {
-                "status": "skipped",
-                "reason": "Clustering failed"
-            }
-    else:
+    try:
+        clusters = get_clusters(df)
+    except Exception:
         clusters = {
             "status": "skipped",
-            "reason": "Not enough numeric columns"
+            "reason": "Clustering failed"
         }
 
     summary = {
