@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const api = axios.create({
-  baseURL: "https://datadecoder-ruct.onrender.com"
+  baseURL: "https://datadecoder-ruct.onrender.com/api"
 })
 
 export async function uploadCSV(file) {
