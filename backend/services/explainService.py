@@ -24,24 +24,20 @@ def run_explain(session_id, target):
     if mode == "ml":
         correlation = get_correlation(df, target)
         top_features = correlation["feature_importance"]
+        pearson = correlation.get("pearson", {}) # Get pearson if it exists, otherwise use an empty dictionary instead of crashing
+        spearman = correlation.get("spearman", {}) #{} is just a safe backup value when "pearson" or "spearman" is missing.
     else:
+        correlation = get_correlation(df, None)  
         top_features = {}
+        pearson = correlation.get("pearson", {})
+        spearman = correlation.get("spearman", {})
 
-    numeric_cols = df.select_dtypes(include="number").shape[1]
-
-    if numeric_cols >= 2:
-        try:
-            clusters = get_clusters(df)
-            clusters["status"] = "success"
-        except:
-            clusters = {
-                "status": "skipped",
-                "reason": "Clustering failed"
-            }
-    else:
+    try:
+        clusters = get_clusters(df)
+    except Exception:
         clusters = {
             "status": "skipped",
-            "reason": "Not enough numeric columns"
+            "reason": "Clustering failed"
         }
 
     summary = {
@@ -51,7 +47,9 @@ def run_explain(session_id, target):
         "mode": mode,
         "target": target,
         "top_features": top_features,
-        "clusters": clusters
+        "clusters": clusters,
+        "pearson": pearson,
+        "spearman": spearman
     }
 
     prompt = build_prompt(summary, profile)

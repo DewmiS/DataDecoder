@@ -18,12 +18,6 @@ async def correlation(request: SessionRequest):
 
     df = session_store[session_id]["df"]
 
-    if not target or target not in df.columns:
-      return {
-          "message": "No target column selected. Showing general correlations.",
-          "correlation_matrix": df.select_dtypes(include="number").corr().to_dict()
-      }
-    
     try:
         return get_correlation(df, target)
     except ValueError as e:
