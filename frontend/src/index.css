@@ -1,2 +1,40 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
+
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  font-family: 'Syne', sans-serif;
+}
+
+body {
+  background-color: #0f0f0f;
+  color: white;
+}
+
+.font-display {
+  font-family: 'Syne', sans-serif;
+}
+
+.font-mono-custom {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-fade-up { animation: fadeUp 0.7s ease forwards; }
+.animate-fade-up-delay { animation: fadeUp 0.7s ease 0.2s forwards; opacity: 0; }
+.animate-fade-up-delay2 { animation: fadeUp 0.7s ease 0.4s forwards; opacity: 0; }
+.cursor-blink { animation: blink 1s step-end infinite; }
+.ticker-text { transition: opacity 0.3s ease, transform 0.3s ease; }
+.step-card:hover .step-num { color: #f59e0b; }
+.feature-card:hover { border-color: rgba(245,158,11,0.3); }
+.feature-card:hover .feature-icon { color: #f59e0b; }

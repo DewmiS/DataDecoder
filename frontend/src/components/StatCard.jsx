@@ -1,8 +1,8 @@
 export default function StatCard({ label, value }) {
   return (
-    <div className="bg-[#1a1a1a] p-5 rounded-xl shadow-sm">
-      <p className="text-xs text-gray-400 mb-1">{label}</p>
-      <p className="text-xl font-semibold">{value}</p>
+    <div className="bg-white/5 p-6 rounded-xl border border-white/5">
+      <p className="text-xs text-white/30 tracking-widest mb-3 font-mono-custom uppercase">{label}</p>
+      <p className="text-3xl font-display font-extrabold text-white">{value}</p>
     </div>
   )
 }

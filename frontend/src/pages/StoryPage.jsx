@@ -77,17 +77,16 @@ export default function StoryPage() {
         <p className="text-red-400">{error}</p>
         <div className="grid grid-cols-2 gap-4 mb-10">
 
-        {featureImportance && Object.keys(featureImportance).length > 0 && 
           <div className="bg-[#1a1a1a] rounded-xl p-4">
-            <p className="text-white/30 text-xs mb-3">TOP FEATURES</p>
+            <p className="text-[10px] text-white/30 tracking-widest mb-3 font-mono-custom">TOP FEATURES</p>
             <div className="space-y-2">
               {Object.entries(featureImportance)
               .sort((a, b) => b[1] - a[1])
               .map(([col, val]) => (
                 <div key={col}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-amber-400">{col}</span>
-                    <span className="text-white/40 font-mono">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-amber-400 font-display font-bold">{col}</span>
+                    <span className="text-white/40 font-mono-custom">
                       {val.toFixed(3)}
                     </span>
                   </div>
@@ -100,7 +99,7 @@ export default function StoryPage() {
                 </div>
               ))}
           </div>
-        </div>}
+        </div>
 
         <div className="bg-[#1a1a1a] rounded-xl p-4">
           <p className="text-white/30 text-xs mb-3">CLUSTER SIZES</p>
@@ -139,11 +138,11 @@ export default function StoryPage() {
   }
 
   return (
-    <PageLayout title="Your Data Story" phase={5}>
+    <PageLayout title="Your Data Story" phase={3}>
 
-      <div className="inline-flex items-center gap-2 text-xs text-amber-400
+      <div className="inline-flex items-center gap-2 text-[10px] text-amber-400 font-mono-custom
                       border border-amber-500/30 px-3 py-1 rounded-full mb-6">
-        ✦ YOUR AI
+        ✦ DATA STORY
       </div>
 
       <div className="bg-[#1a1a1a] rounded-xl p-6 mb-6 prose prose-invert
@@ -156,15 +155,15 @@ export default function StoryPage() {
 
         {featureImportance && Object.keys(featureImportance).length > 0 && 
           <div className="bg-[#1a1a1a] rounded-xl p-4">
-          <p className="text-white/30 text-xs mb-3">TOP FEATURES</p>
+          <p className="text-[10px] text-white/30 tracking-widest mb-3 font-mono-custom uppercase">TOP FEATURES</p>
           <div className="space-y-2">
             {Object.entries(featureImportance)
               .sort((a, b) => b[1] - a[1])
               .map(([col, val]) => (
                 <div key={col}>
-                  <div className="flex justify-between text-sm mb-1">
-                    <span className="text-amber-400">{col}</span>
-                    <span className="text-white/40 font-mono">
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-amber-400 font-display font-bold">{col}</span>
+                    <span className="text-white/40 font-mono-custom">
                       {val.toFixed(3)}
                     </span>
                   </div>
@@ -205,18 +204,18 @@ export default function StoryPage() {
 
       <div className="flex justify-between">
         <button
-          onClick={() => navigate("/clusters")}
-          className="border border-white/20 px-4 py-2 rounded text-sm
-                     hover:border-white/40"
+          onClick={() => navigate("/analysis")}
+          className="border border-white/10 px-5 py-2.5 rounded-xl text-sm font-display
+                     hover:border-white/30 transition-all duration-200"
         >
           ← Back
         </button>
         <button
-          className="bg-amber-500 text-black px-4 py-2 rounded text-sm
-                     font-semibold hover:bg-amber-400 transition"
+          className="bg-amber-500 text-black px-8 py-2.5 rounded-xl text-sm font-display
+                     font-bold hover:bg-amber-400 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           onClick={downloadReport}
         >
-          Export Report
+          Export AI Report (PDF) →
         </button>
       </div>
 

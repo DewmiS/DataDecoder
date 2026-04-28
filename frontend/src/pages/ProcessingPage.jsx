@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSession } from "../context/SessionContext"
 import { profile, correlation, clustering } from "../services/api"
+import PageLayout from "../components/PageLayout"
 
 export default function ProcessingPage() {
   const navigate = useNavigate()
@@ -23,7 +24,6 @@ export default function ProcessingPage() {
     const runAnalysis = async () => {
       const finalResults = {}
 
-      // PROFILE
       setSteps(prev => ({ ...prev, profile: "loading" }))
       try {
         const res = await profile(sessionId)
@@ -34,7 +34,6 @@ export default function ProcessingPage() {
         setSteps(prev => ({ ...prev, profile: "error" }))
       }
 
-      // CORRELATION
       setSteps(prev => ({ ...prev, correlation: "loading" }))
       try {
         const res = await correlation(sessionId, target)
@@ -45,7 +44,6 @@ export default function ProcessingPage() {
         setSteps(prev => ({ ...prev, correlation: "error" }))
       }
 
-      // CLUSTERING
       setSteps(prev => ({ ...prev, clustering: "loading" }))
       try {
         const res = await clustering(sessionId)
@@ -59,7 +57,7 @@ export default function ProcessingPage() {
       setResults(finalResults)
       
       setTimeout(() => {
-        navigate("/profile")
+        navigate("/analysis")
       }, 1000)
     }
 
@@ -67,30 +65,33 @@ export default function ProcessingPage() {
   }, [sessionId])
 
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white flex flex-col items-center justify-center">
+    <PageLayout title="Analyzing Dataset" phase={1}>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="w-12 h-12 border-2 border-amber-500 border-t-transparent rounded-full animate-spin mb-8" />
 
-      <h1 className="text-3xl font-bold mb-8">Analyzing your data...</h1>
+        <h1 className="text-4xl font-display font-extrabold mb-10 tracking-tight text-center">
+          Decoding <span className="text-amber-400">your dataset...</span>
+        </h1>
 
-      <div className="w-full max-w-md space-y-4">
-
-        {Object.entries(steps).map(([key, value]) => (
-          <div key={key} className="flex justify-between items-center border-b border-white/10 pb-2">
-
-            <span className="capitalize text-white/70">{key}</span>
-
-            <span className={`text-sm ${
-              value === "done" ? "text-green-400" :
-              value === "loading" ? "text-amber-400" :
-              value === "error" ? "text-red-400" :
-              "text-white/30"
-            }`}>
-              {value}
-            </span>
-
-          </div>
-        ))}
-
+        <div className="w-full max-w-sm space-y-3">
+          {Object.entries(steps).map(([key, value]) => (
+            <div key={key} className="flex justify-between items-center bg-white/5 border border-white/5 px-4 py-3 rounded-xl transition-all duration-300">
+              <span className="capitalize text-white/50 text-sm font-display font-bold tracking-wide">{key}</span>
+              <div className="flex items-center gap-3">
+                <span className={`text-[10px] font-mono-custom uppercase tracking-widest ${
+                  value === "done" ? "text-green-400" :
+                  value === "loading" ? "text-amber-400" :
+                  value === "error" ? "text-red-400" :
+                  "text-white/20"
+                }`}>
+                  {value}
+                </span>
+                {value === "loading" && <div className="w-1 h-1 rounded-full bg-amber-400 animate-ping" />}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
-    </div>
+    </PageLayout>
   )
-}
+}

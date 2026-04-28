@@ -1,10 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import LandingPage from './pages/LandingPage'
 import UploadPage from './pages/UploadPage'
 import { SessionProvider } from './context/SessionContext'
 import ProcessingPage from './pages/ProcessingPage'
-import ProfilePage from './pages/ProfilePage'
-import PatternsPage from './pages/PatternsPage'
-import ClustersPage from './pages/ClustersPage'
+import AnalysisPage from './pages/AnalysisPage'
 import StoryPage from './pages/StoryPage'
 
 function App() {
@@ -14,11 +13,10 @@ function App() {
       <SessionProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<UploadPage />} />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/upload" element={<UploadPage />} />
             <Route path="/processing" element={<ProcessingPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-            <Route path="/patterns" element={<PatternsPage />} />
-            <Route path="/clusters" element={<ClustersPage />} />
+            <Route path="/analysis" element={<AnalysisPage />} />
             <Route path="/story" element={<StoryPage />} />
           </Routes>
         </BrowserRouter>
