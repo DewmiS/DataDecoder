@@ -1,6 +1,7 @@
 import PageLayout from "../components/PageLayout"
 import StatCard from "../components/StatCard"
 import { useNavigate } from "react-router-dom"
+import { useSession } from "../context/SessionContext"
 
 
 export default function ProfilePage() {

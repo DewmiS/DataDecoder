@@ -5,7 +5,7 @@ const SessionContext = createContext(null)
 export function SessionProvider({ children }) {
 
   const [sessionId, setSessionId] = useState(()=>{
-    localStorage.getItem("sessionId")
+    return localStorage.getItem("sessionId")
   })
  
   const [datasetInfo, setDatasetInfo] = useState(()=>{
@@ -46,7 +46,7 @@ export function SessionProvider({ children }) {
   const clearSession = () => {
     setSessionId(null)
     setDatasetInfo(null)
-    setResults({})
+    setResults(null)
     setAnalysisSteps([])
     localStorage.removeItem("sessionId")
     localStorage.removeItem("datasetInfo")
