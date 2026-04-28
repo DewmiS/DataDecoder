@@ -53,7 +53,7 @@ def get_clusters(df):
             df_processed = pd.concat([df_processed.drop(columns=[col]), dummies], axis=1).reset_index(drop=True)
             encoded_columns.append({"column": col, "method": "one-hot", "new_columns": n_unique})
 
-        elif n_unique <= 50:
+        elif n_unique <= 20:
             freq_map = df_processed[col].value_counts(normalize=True)
             df_processed[col] = df_processed[col].map(freq_map).astype(float)
             encoded_columns.append({"column": col, "method": "frequency", "unique_values": n_unique})
@@ -122,6 +122,30 @@ def get_clusters(df):
         int(k): int(v)
         for k, v in df_numeric["cluster"].value_counts().sort_index().items()
     }
+
+    df_original = df.copy().reset_index(drop=True)
+    df_original["cluster"] = cluster_labels
+
+    num_cols = df_original.select_dtypes(include="number").columns.tolist()
+    cat_cols = df_original.select_dtypes(exclude="number").columns.tolist()
+
+    if "cluster" in num_cols:
+        num_cols.remove("cluster")
+
+    cluster_summary = {}
+
+    for cluster_id, group in df_original.groupby("cluster"):
+      summary = {}
+
+      # Mean - numeric
+      for col in num_cols:
+          summary[col] = round(group[col].mean(), 4)
+
+      # Mode - categorical
+      for col in cat_cols:
+          summary[col] = group[col].mode().iloc[0] if not group[col].mode().empty else None
+
+      cluster_summary[int(cluster_id)] = summary
 
     result = {
         "status": "success" if separation == "strong" else "soft",
