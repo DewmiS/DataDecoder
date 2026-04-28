@@ -56,13 +56,8 @@ export default function ProcessingPage() {
         setSteps(prev => ({ ...prev, clustering: "error" }))
       }
 
-      // EXPLAIN - Skipping call here as requested, it's done in StoryPage
-      setSteps(prev => ({ ...prev, explain: "done" }))
-
-      // Finalize
       setResults(finalResults)
       
-      // Give a small delay so user can see the status
       setTimeout(() => {
         navigate("/profile")
       }, 1000)
