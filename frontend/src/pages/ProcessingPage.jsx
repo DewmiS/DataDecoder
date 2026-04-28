@@ -21,7 +21,6 @@ export default function ProcessingPage() {
     if (!sessionId) return
 
     const runAnalysis = async () => {
-
       const finalResults = {}
 
       // PROFILE
@@ -30,9 +29,9 @@ export default function ProcessingPage() {
         const res = await profile(sessionId)
         finalResults.profile = res
         setSteps(prev => ({ ...prev, profile: "done" }))
-      } catch {
+      } catch (err) {
+        console.error("Profile error:", err)
         setSteps(prev => ({ ...prev, profile: "error" }))
-        return
       }
 
       // CORRELATION
@@ -41,7 +40,8 @@ export default function ProcessingPage() {
         const res = await correlation(sessionId, target)
         finalResults.correlation = res
         setSteps(prev => ({ ...prev, correlation: "done" }))
-      } catch {
+      } catch (err) {
+        console.error("Correlation error:", err)
         setSteps(prev => ({ ...prev, correlation: "error" }))
       }
 
@@ -51,37 +51,21 @@ export default function ProcessingPage() {
         const res = await clustering(sessionId)
         finalResults.clustering = res
         setSteps(prev => ({ ...prev, clustering: "done" }))
-        setResults(finalResults)
-        navigate("/profile")
-
-        return // stop further execution
-
-      } catch {
+      } catch (err) {
+        console.error("Clustering error:", err)
         setSteps(prev => ({ ...prev, clustering: "error" }))
       }
 
-      // EXPLAIN
-      // setSteps(prev => ({ ...prev, explain: "loading" }))
-      // try {
-      //   const res = await explain(sessionId, target)
+      // EXPLAIN - Skipping call here as requested, it's done in StoryPage
+      setSteps(prev => ({ ...prev, explain: "done" }))
 
-      //   const finalResults = {
-      //     ...results,
-      //     explain: res
-      //   }
-
-      //   setResults(finalResults)
-      //   setSteps(prev => ({ ...prev, explain: "done" }))
-
-      //   navigate("/results", {
-      //     state: {
-      //       results: finalResults
-      //     }
-      //   })
-
-      // } catch {
-      //   setSteps(prev => ({ ...prev, explain: "error" }))
-      // }
+      // Finalize
+      setResults(finalResults)
+      
+      // Give a small delay so user can see the status
+      setTimeout(() => {
+        navigate("/profile")
+      }, 1000)
     }
 
     runAnalysis()

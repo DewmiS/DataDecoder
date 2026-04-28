@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { useSession } from "../context/SessionContext"
 import { explain } from "../services/api"
 import { report } from "../services/api"
@@ -7,17 +7,16 @@ import PageLayout from "../components/PageLayout"
 import ReactMarkdown from "react-markdown"
 
 export default function StoryPage() {
-  const { state } = useLocation()
   const navigate = useNavigate()
-  const { sessionId, datasetInfo } = useSession()
+  const { sessionId, datasetInfo, results } = useSession()
 
   const [story, setStory]     = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError]     = useState(null)
 
   const target = datasetInfo?.target
-  const correlation = state?.results?.correlation ?? {}
-  const cluster = state?.results?.clustering ?? {}
+  const correlation = results?.correlation ?? {}
+  const cluster = results?.clustering ?? {}
   const featureImportance = correlation?.feature_importance ?? {}
   const maxFeature   = Math.max(...Object.values(featureImportance))
   const clusterSizes = cluster?.cluster_sizes ?? {}
@@ -206,7 +205,7 @@ export default function StoryPage() {
 
       <div className="flex justify-between">
         <button
-          onClick={() => navigate("/clusters", { state })}
+          onClick={() => navigate("/clusters")}
           className="border border-white/20 px-4 py-2 rounded text-sm
                      hover:border-white/40"
         >

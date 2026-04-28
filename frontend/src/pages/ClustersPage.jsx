@@ -1,5 +1,6 @@
 import PageLayout from "../components/PageLayout"
 import { useNavigate } from "react-router-dom"
+import { useSession } from "../context/SessionContext"
 
 const CLUSTER_COLORS = [
   { border: "border-blue-500",   text: "text-blue-400",   bg: "bg-blue-500" },
@@ -28,13 +29,13 @@ export default function ClustersPage() {
         </p>
         <div className="flex justify-between">
         <button
-          onClick={() => navigate("/patterns", { state })}
+          onClick={() => navigate("/patterns")}
           className="border border-white/20 px-4 py-2 rounded text-sm hover:border-white/40"
         >
           ← Back
         </button>
         <button
-          onClick={() => navigate("/story", { state })}
+          onClick={() => navigate("/story")}
           className="border border-white/20 px-4 py-2 rounded text-sm hover:border-white/40"
         >
           AI Story →
