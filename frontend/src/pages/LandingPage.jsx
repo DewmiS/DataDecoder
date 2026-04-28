@@ -33,12 +33,12 @@ export default function LandingPage() {
         </nav>
 
         <section className="relative min-h-[80vh] flex flex-col items-center justify-center px-6 text-center">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-amber-500/[0.03] blur-3xl pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-150 h-150 rounded-full bg-amber-500/3 blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-4xl mx-auto">
             <div className="inline-flex items-center gap-2 text-xs text-amber-400 border border-amber-500/30 bg-amber-500/5 px-3 py-1.5 rounded-full mb-8 font-mono-custom animate-fade-up">
               <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse inline-block" />
-              CSV → Insights in under 60 seconds
+              CSV → Insights
             </div>
 
             <h1 className="font-display text-6xl md:text-8xl font-extrabold leading-[0.95] tracking-tight mb-6 animate-fade-up-delay">
@@ -54,7 +54,7 @@ export default function LandingPage() {
             <div className="flex items-center justify-center gap-4 animate-fade-up-delay2">
               <button
                 onClick={() => navigate("/upload")}
-                className="bg-amber-500 hover:bg-amber-400 text-black font-display font-bold px-8 py-3.5 rounded-xl text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+                className="hover:bg-amber-500 bg-amber-400 text-black font-display font-bold px-8 py-3.5 rounded-xl text-base transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
               >
                 Analyze your data
               </button>
