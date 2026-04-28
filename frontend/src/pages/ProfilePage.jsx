@@ -29,11 +29,12 @@ export default function ProfilePage() {
 
       <div className="bg-[#1a1a1a] rounded-xl p-5">
 
-        <div className="grid grid-cols-6 text-xs text-gray-400 tracking-widest mb-3 px-1">
+        <div className="grid grid-cols-7 text-xs text-gray-400 tracking-widest mb-3 px-1">
           <span>COLUMN</span>
           <span>TYPE</span>
           <span>MIN</span>
           <span>MAX</span>
+          <span>MODE</span>
           <span>MEAN</span>
           <span>NULLS</span>
         </div>
@@ -47,7 +48,7 @@ export default function ProfilePage() {
           return (
             <div
               key={i}
-              className="grid grid-cols-6 py-3 border-t border-white/10
+              className="grid grid-cols-7 py-3 border-t border-white/10
                          text-sm items-center"
             >
               <span className="text-white/80">{name}</span>
@@ -65,6 +66,10 @@ export default function ProfilePage() {
 
               <span className="text-white/60 font-mono text-xs">
                 {col.max ?? "—"}
+              </span>
+
+              <span className="text-white/60 font-mono text-xs">
+                {col.mode ?? "-"}
               </span>
 
               <span className="text-white/60 font-mono text-xs">
