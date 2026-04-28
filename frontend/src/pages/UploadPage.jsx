@@ -5,7 +5,7 @@ import { uploadCSV } from '../services/api'
 
 export default function UploadPage() {
   const navigate = useNavigate()
-  const { setSessionId, setDatasetInfo, datasetInfo } = useSession()
+  const { setSessionId, setDatasetInfo, datasetInfo, clearSession } = useSession()
 
   const [loading, setIsLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -17,12 +17,21 @@ export default function UploadPage() {
       return
     }
 
+    if(datasetInfo){
+      const confirmed = window.confirm("This will clear your current session. Continue?")
+      if(!confirmed){
+        return
+      }
+      clearSession()
+    }
+
     // if (file.size > 10 * 1024 * 1024) {
     //   setError('File must be under 10MB')
     //   return
     // }
 
     try {
+
       setIsLoading(true)
       setError(null)
 

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import PageLayout from "../components/PageLayout"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 function getCellColor(value) {
   if (value >= 0.7)  return "bg-red-700"
@@ -10,12 +10,11 @@ function getCellColor(value) {
 }
 
 export default function PatternsPage() {
-  const { state } = useLocation()
+  const {results} = useSession()
   const navigate = useNavigate()
   const [mode, setMode] = useState("pearson")
 
-  const correlation = state?.results?.correlation
-  const profile = state?.results?.profile
+  const correlation = results?.correlation
 
   if (!correlation) {
     return <div className="text-white p-10">No correlation data found</div>
@@ -132,16 +131,16 @@ export default function PatternsPage() {
 
       <div className="flex justify-between mt-10">
         <button
-          onClick={() => navigate("/profile", { state })}
+          onClick={() => navigate("/profile")}
           className="border border-white/20 px-4 py-2 rounded text-sm hover:border-white/40"
         >
           ← Back
         </button>
         <button
-          onClick={() => navigate("/clusters", { state })}
+          onClick={() => navigate("/clusters")}
           className="border border-white/20 px-4 py-2 rounded text-sm hover:border-white/40"
         >
-          Clusters →
+          Clusters →  
         </button>
       </div>
 

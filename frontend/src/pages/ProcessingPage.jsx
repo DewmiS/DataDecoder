@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useSession } from "../context/SessionContext"
-import { profile, correlation, clustering, explain } from "../services/api"
+import { profile, correlation, clustering } from "../services/api"
 
 export default function ProcessingPage() {
   const navigate = useNavigate()
-  const { sessionId, datasetInfo } = useSession()
+  const { sessionId, datasetInfo, setResults } = useSession()
 
   const target = datasetInfo?.target
 
@@ -15,13 +15,6 @@ export default function ProcessingPage() {
     correlation: "pending",
     clustering: "pending",
     explain: "pending"
-  })
-
-  const [results, setResults] = useState({
-    profile: null,
-    correlation: null,
-    clustering: null,
-    explain: null
   })
 
   useEffect(() => {
@@ -58,11 +51,8 @@ export default function ProcessingPage() {
         const res = await clustering(sessionId)
         finalResults.clustering = res
         setSteps(prev => ({ ...prev, clustering: "done" }))
-        navigate("/profile", {
-          state: {
-            results: finalResults
-          }
-        })
+        setResults(finalResults)
+        navigate("/profile")
 
         return // stop further execution
 
