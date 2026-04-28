@@ -19,23 +19,24 @@ export default function PageLayout({ title, phase, children }) {
           DataDecoder <span className="text-yellow-500 text-xs ml-2">AI</span>
         </h1>
 
-        <button
-          onClick={handleNewAnalysis}
-          className="text-xs text-white/40 hover:text-white/80 border border-white/10 
-                     hover:border-white/30 px-3 py-1.5 rounded-lg transition"
-        >
-          + New Analysis
-        </button>
-
-        <div className="flex gap-2">
-          {[1,2,3,4,5].map(i => (
-            <div
-              key={i}
-              className={`w-2 h-2 rounded-full ${
-                i <= phase ? "bg-green-400" : "bg-gray-600"
-              }`}
-            />
-          ))}
+        <div className="flex justify-between items-center mb-10">
+          <button
+            onClick={handleNewAnalysis}
+            className="text-xs hover:text-white/80 border border-white/10
+                       hover:border-white/30 px-3 py-1.5 mr-5 rounded-lg transition bg-yellow-500 text-black font-bold"
+          >
+            + New Analysis
+          </button>
+          <div className="flex gap-2">
+            {[1,2,3,4,5].map(i => (
+              <div
+                key={i}
+                className={`w-2 h-2 rounded-full ${
+                  i <= phase ? "bg-green-400" : "bg-gray-600"
+                }`}
+              />
+            ))}
+          </div>
         </div>
       </div>
 
