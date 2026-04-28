@@ -1,13 +1,13 @@
 import PageLayout from "../components/PageLayout"
 import StatCard from "../components/StatCard"
-import { useLocation, useNavigate } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 
 
 export default function ProfilePage() {
   const navigate = useNavigate()
-  const { state } = useLocation()
+  const {results} = useSession()
 
-  const profile = state?.results?.profile
+  const profile = results?.profile
 
   if (!profile) {
     return <div className="text-white p-10">No data found</div>
@@ -97,7 +97,7 @@ export default function ProfilePage() {
           ← Back
         </button>
         <button
-          onClick={() => navigate("/patterns", { state })}
+          onClick={() => navigate("/patterns")}
           className="border border-white/20 px-4 py-2 rounded text-sm
                      hover:border-white/40"
         >
