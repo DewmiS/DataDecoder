@@ -124,8 +124,7 @@ export default function UploadPage() {
 
                     <button
                       onClick={() => {
-                        setDatasetInfo(null)
-                        setSessionId(null)
+                        clearSession()
                       }}
                       className="text-xs text-red-400 hover:text-red-300"
                     >
@@ -138,7 +137,7 @@ export default function UploadPage() {
                       <thead className="bg-white/5 text-white/60 sticky top-0">
                         <tr>
                           {datasetInfo.column_names.map(col => (
-                            <th key={col} className="px-3 py-2">{col}</th>
+                            <th key={col} className="px-3 py-2 text-left min-w-45 whitespace-normal align-top">{col}</th>
                           ))}
                         </tr>
                       </thead>
