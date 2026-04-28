@@ -4,18 +4,7 @@ import { useSession } from "../context/SessionContext"
 import PageLayout from "../components/PageLayout"
 import StatCard from "../components/StatCard"
 
-const CLUSTER_COLORS = [
-  { border: "border-blue-500",   text: "text-blue-400",   bg: "bg-blue-500" },
-  { border: "border-amber-500",  text: "text-amber-400",  bg: "bg-amber-500" },
-  { border: "border-green-500",  text: "text-green-400",  bg: "bg-green-500" },
-  { border: "border-purple-500", text: "text-purple-400", bg: "bg-purple-500" },
-  { border: "border-rose-500",   text: "text-rose-400",   bg: "bg-rose-500" },
-  { border: "border-cyan-500",   text: "text-cyan-400",   bg: "bg-cyan-500" },
-  { border: "border-orange-500", text: "text-orange-400", bg: "bg-orange-500" },
-  { border: "border-teal-500",   text: "text-teal-400",   bg: "bg-teal-500" },
-  { border: "border-pink-500",   text: "text-pink-400",   bg: "bg-pink-500" },
-  { border: "border-indigo-500", text: "text-indigo-400", bg: "bg-indigo-500" },
-]
+const CLUSTER_COLOR = "border-blue-500" 
 
 function getCellColor(value) {
   if (value >= 0.7)  return "bg-red-700"
@@ -36,8 +25,6 @@ export default function AnalysisPage() {
   const profile = results.profile
   const correlation = results.correlation
   const clustering = results.clustering
-
-  // --- TAB CONTENT COMPONENTS ---
 
   const renderProfile = () => {
     if (!profile) return <p className="text-white/40 italic">Profile data unavailable</p>
@@ -209,7 +196,7 @@ export default function AnalysisPage() {
         <p className="text-white/40 text-[10px] mb-8 font-mono-custom uppercase tracking-widest">K-Means · k={bestK} · Automated Selection</p>
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
           {clusters.map((cluster, i) => {
-            const color = CLUSTER_COLORS[i] ?? CLUSTER_COLORS[0]
+            const color = CLUSTER_COLOR
             const pct = Math.round((cluster.size / totalRows) * 100)
             return (
               <div key={cluster.id} className={`bg-white/5 rounded-2xl p-6 border-l-4 ${color.border} hover:bg-white/[0.08] transition-colors`}>
