@@ -1,6 +1,7 @@
 import { useState } from "react"
 import PageLayout from "../components/PageLayout"
 import { useNavigate } from "react-router-dom"
+import { useSession } from "../context/SessionContext"
 
 function getCellColor(value) {
   if (value >= 0.7)  return "bg-red-700"
@@ -10,7 +11,7 @@ function getCellColor(value) {
 }
 
 export default function PatternsPage() {
-  const {results} = useSession()
+  const {results, datasetInfo} = useSession()
   const navigate = useNavigate()
   const [mode, setMode] = useState("pearson")
 
@@ -101,7 +102,7 @@ export default function PatternsPage() {
         {Object.keys(featureImportance).length > 0 && ( // Feature Importance
           <div className="w-72">
             <p className="text-xs text-gray-400 tracking-widest mb-4">
-              FEATURE IMPORTANCE → {state?.results?.profile?.target ?? "TARGET"}
+              FEATURE IMPORTANCE → {datasetInfo?.target ?? "TARGET"}
             </p>
 
             <div className="space-y-3">
