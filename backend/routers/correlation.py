@@ -20,5 +20,15 @@ async def correlation(request: SessionRequest):
 
     try:
         return get_correlation(df, target)
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        print(f"Correlation error: {e}")
+        return {
+            "mode": "ml" if target else "eda",
+            "rows": len(df),
+            "columns": len(df.columns),
+            "pearson": {},
+            "spearman": {},
+            "feature_importance": {},
+            "status": "error",
+            "error_message": str(e)
+        }

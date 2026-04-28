@@ -19,5 +19,9 @@ async def clusters(request: SessionRequest):
   
   try:
       return get_clusters(df)
-  except ValueError as e:
-      raise HTTPException(status_code=400, detail=str(e))
+  except Exception as e:
+      print(f"Clustering error: {e}")
+      return {
+          "status": "skipped",
+          "reason": f"Clustering failed: {str(e)}"
+      }

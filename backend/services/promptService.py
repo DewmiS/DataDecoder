@@ -1,27 +1,37 @@
 def build_prompt(summary, profile):
 
-    column_names = ", ".join(profile["column_name"])
+    column_names = ", ".join(profile.get("column_name", []))
 
-    column_details = "\n".join([
-        f"- {list(col.keys())[0]} | type: {list(col.values())[0]}"
-        for col in profile["column_details"]
-    ])
+    column_details_list = profile.get("column_details", [])
+    if column_details_list and isinstance(column_details_list[0], dict) and "error" in column_details_list[0]:
+        column_details = "- Error: Profiling failed for this dataset."
+    else:
+        column_details = "\n".join([
+            f"- {list(col.keys())[0]} | type: {list(col.values())[0]}"
+            for col in column_details_list if isinstance(col, dict) and col
+        ])
 
-    features_text = "\n".join(
-        [f"- {k}: {v}" for k, v in summary["top_features"].items()]
-    )
+    top_features = summary.get("top_features")
+    if top_features:
+        features_text = "\n".join(
+            [f"- {k}: {v}" for k, v in top_features.items()]
+        )
+    else:
+        features_text = "Not available (correlation analysis skipped or failed)."
 
+    pearson_data = summary.get("top_pearson")
     pearson_text = "\n".join([
         f"- {a} & {b}: {round(v, 2)}"
-        for a, b, v in summary.get("top_pearson", [])
-    ])
+        for a, b, v in pearson_data
+    ]) if pearson_data else "Not applied or failed."
 
+    spearman_data = summary.get("top_spearman")
     spearman_text = "\n".join([
         f"- {a} & {b}: {round(v, 2)}"
-        for a, b, v in summary.get("top_spearman", [])
-    ])
+        for a, b, v in spearman_data
+    ]) if spearman_data else "Not applied or failed."
 
-    clusters = summary["clusters"]
+    clusters = summary.get("clusters", {})
     cluster_status = clusters.get("status")
 
     if cluster_status == "success":
@@ -67,7 +77,7 @@ Cluster Analysis:
 Not applied
 
 Reason:
-{clusters.get("reason")}
+{clusters.get("reason", "Analysis failed or was skipped.")}
 """
 
     prompt = f"""
@@ -83,9 +93,9 @@ Format:
 5. Conclusion
 
 Dataset:
-- Rows: {summary['rows']}
-- Columns: {summary['columns']}
-- Numeric columns: {summary['numeric_columns']}
+- Rows: {summary.get('rows', 'Unknown')}
+- Columns: {summary.get('columns', 'Unknown')}
+- Numeric columns: {summary.get('numeric_columns', 'Unknown')}
 
 Column Names:
 {column_names}
@@ -94,16 +104,6 @@ Column Details:
 {column_details}
 """
     
-    prompt += f"""
-Correlation Analysis:
-
-Top Pearson (linear relationships):
-{pearson_text}
-
-Top Spearman (rank relationships):
-{spearman_text}
-"""
-
     prompt += f"""
 Correlation Analysis:
 
