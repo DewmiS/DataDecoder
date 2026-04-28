@@ -135,17 +135,21 @@ def get_clusters(df):
     cluster_summary = {}
 
     for cluster_id, group in df_original.groupby("cluster"):
-      summary = {}
+      cat_summary = {}
+      num_summary = {}
 
       # Mean - numeric
       for col in num_cols:
-          summary[col] = round(group[col].mean(), 4)
+          num_summary[col] = round(group[col].mean(), 4)
 
       # Mode - categorical
       for col in cat_cols:
-          summary[col] = group[col].mode().iloc[0] if not group[col].mode().empty else None
+          cat_summary[col] = group[col].mode().iloc[0] if not group[col].mode().empty else None
 
-      cluster_summary[int(cluster_id)] = summary
+      cluster_summary[int(cluster_id)] = {
+        "numeric": num_summary,
+        "categorical": cat_summary
+    }
 
     result = {
         "status": "success" if separation == "strong" else "soft",
