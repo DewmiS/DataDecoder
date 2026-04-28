@@ -37,6 +37,8 @@ export default function AnalysisPage() {
   const correlation = results.correlation
   const clustering = results.clustering
 
+  // --- TAB CONTENT COMPONENTS ---
+
   const renderProfile = () => {
     if (!profile) return <p className="text-white/40 italic">Profile data unavailable</p>
     const avgMissing = (profile.column_details.reduce((sum, col) => sum + (col.null_percentage ?? 0), 0) / profile.column_details.length).toFixed(1)
@@ -51,7 +53,7 @@ export default function AnalysisPage() {
         </div>
 
         <div className="bg-white/5 border border-white/5 rounded-2xl p-6 overflow-hidden">
-          <div className="grid grid-cols-7 text-sm text-white/40 tracking-widest mb-6 px-1 font-mono-custom uppercase font-bold">
+          <div className="grid grid-cols-7 text-xs text-white/30 tracking-widest mb-4 px-1 font-mono-custom uppercase">
             <span>COLUMN</span>
             <span>TYPE</span>
             <span>MIN</span>
@@ -69,19 +71,19 @@ export default function AnalysisPage() {
                 <div key={i} className="grid grid-cols-7 py-4 border-t border-white/5 text-base items-center hover:bg-white/[0.02] transition-colors">
                   <span className="text-white/90 font-display font-bold">{name}</span>
                   <span>
-                    <span className="bg-white/10 text-white/80 text-sm px-3 py-1.5 rounded-lg font-mono-custom uppercase border border-white/5 font-bold">
+                    <span className="bg-white/10 text-white/70 text-xs px-2.5 py-1 rounded font-mono-custom uppercase border border-white/5">
                       {type}
                     </span>
                   </span>
-                  <span className="text-white/60 font-mono-custom text-base">{col.min ?? "—"}</span>
-                  <span className="text-white/60 font-mono-custom text-base">{col.max ?? "—"}</span>
-                  <span className="text-white/60 font-mono-custom text-base">{col.mode ?? "—"}</span>
-                  <span className="text-white/60 font-mono-custom text-base">{col.mean != null ? Number(col.mean).toFixed(1) : "—"}</span>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-1 h-3 bg-white/10 rounded-full overflow-hidden">
-                      <div className="h-full bg-amber-500" style={{ width: `${Math.min(nullPct, 100)}%` }} />
+                  <span className="text-white/50 font-mono-custom text-sm">{col.min ?? "—"}</span>
+                  <span className="text-white/50 font-mono-custom text-sm">{col.max ?? "—"}</span>
+                  <span className="text-white/50 font-mono-custom text-sm">{col.mode ?? "—"}</span>
+                  <span className="text-white/50 font-mono-custom text-sm">{col.mean != null ? Number(col.mean).toFixed(1) : "—"}</span>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden">
+                      <div className="h-full bg-amber-500/60" style={{ width: `${Math.min(nullPct, 100)}%` }} />
                     </div>
-                    <span className="text-white/60 text-sm font-mono-custom w-12 text-right font-bold">{nullPct}%</span>
+                    <span className="text-white/40 text-xs font-mono-custom w-10 text-right">{nullPct}%</span>
                   </div>
                 </div>
               )
@@ -102,21 +104,21 @@ export default function AnalysisPage() {
     return (
       <div className="animate-fade-up space-y-12">
         {Object.keys(featureImportance).length > 0 && (
-          <div className="bg-white/5 border border-white/5 rounded-2xl p-10">
-            <p className="text-sm text-white/40 tracking-widest mb-8 font-mono-custom uppercase font-bold">
+          <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
+            <p className="text-xs text-white/30 tracking-widest mb-6 font-mono-custom uppercase">
               FEATURE IMPORTANCE → <span className="text-amber-400">{datasetInfo?.target}</span>
             </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {Object.entries(featureImportance)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 8)
                 .map(([col, val]) => (
-                  <div key={col} className="bg-white/5 p-6 rounded-2xl border border-white/5">
-                    <div className="flex justify-between text-base mb-3">
-                      <span className="text-white font-display font-bold truncate pr-2">{col}</span>
-                      <span className="text-amber-500 font-mono-custom font-black">{Math.round((val / maxImportance) * 100)}%</span>
+                  <div key={col} className="bg-white/5 p-4 rounded-xl border border-white/5">
+                    <div className="flex justify-between text-sm mb-2">
+                      <span className="text-white/90 font-display font-bold truncate pr-2">{col}</span>
+                      <span className="text-amber-500 font-mono-custom font-bold">{Math.round((val / maxImportance) * 100)}%</span>
                     </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-white/10 rounded-full overflow-hidden">
                       <div className="h-full bg-amber-500" style={{ width: `${(val / maxImportance) * 100}%` }} />
                     </div>
                   </div>
@@ -125,19 +127,19 @@ export default function AnalysisPage() {
           </div>
         )}
 
-        <div className="bg-white/5 border border-white/5 rounded-2xl p-10">
-          <div className="flex items-center justify-between mb-12">
+        <div className="bg-white/5 border border-white/5 rounded-2xl p-8">
+          <div className="flex items-center justify-between mb-8">
             <div>
-              <p className="text-sm text-white/40 tracking-widest font-mono-custom uppercase mb-2 font-bold">CORRELATION MATRIX</p>
-              <p className="text-white/60 text-base font-display">Relationships between numeric data features</p>
+              <p className="text-xs text-white/30 tracking-widest font-mono-custom uppercase mb-1">CORRELATION MATRIX</p>
+              <p className="text-white/60 text-sm font-display">Discovery of relationships between numeric features</p>
             </div>
-            <div className="inline-flex rounded-full border border-white/15 bg-[#0f0f0f] p-1.5">
+            <div className="inline-flex rounded-full border border-white/15 bg-[#0f0f0f] p-1">
               {["pearson", "spearman"].map((m) => (
                 <button
                   key={m}
                   onClick={() => setCorrMode(m)}
-                  className={`px-10 py-3 text-sm rounded-full capitalize transition-all font-display font-black ${
-                    corrMode === m ? "bg-amber-500 text-black shadow-xl" : "text-white/40 hover:text-white/80"
+                  className={`px-8 py-2.5 text-xs rounded-full capitalize transition-all font-display font-bold ${
+                    corrMode === m ? "bg-amber-500 text-black shadow-lg" : "text-white/40 hover:text-white/70"
                   }`}
                 >
                   {m}
@@ -146,14 +148,14 @@ export default function AnalysisPage() {
             </div>
           </div>
 
-          <div className="overflow-x-auto pb-6 custom-scrollbar">
-            <table className="text-sm border-separate border-spacing-2 mx-auto">
+          <div className="overflow-x-auto pb-4 custom-scrollbar">
+            <table className="text-xs border-separate border-spacing-1 mx-auto">
               <thead>
                 <tr>
-                  <th className="sticky left-0 bg-[#161616] z-10 p-3" />
+                  <th className="sticky left-0 bg-[#161616] z-10 p-2" />
                   {columns.map(col => (
-                    <th key={col} className="px-3 py-6 text-white/40 font-mono-custom font-bold whitespace-nowrap min-w-[80px] max-w-[80px] overflow-hidden text-ellipsis" title={col}>
-                      <div className="rotate-[-45deg] translate-y-4">{col.length > 10 ? col.substring(0, 8) + ".." : col}</div>
+                    <th key={col} className="px-2 py-4 text-white/30 font-mono-custom font-normal whitespace-nowrap min-w-[72px] max-w-[72px] overflow-hidden text-ellipsis" title={col}>
+                      <div className="rotate-[-45deg] translate-y-2">{col.length > 10 ? col.substring(0, 8) + ".." : col}</div>
                     </th>
                   ))}
                 </tr>
@@ -161,7 +163,7 @@ export default function AnalysisPage() {
               <tbody>
                 {columns.map(row => (
                   <tr key={row}>
-                    <td className="sticky left-0 bg-[#161616] z-10 pr-8 py-4 text-white/60 text-right whitespace-nowrap font-mono-custom text-base font-black" title={row}>
+                    <td className="sticky left-0 bg-[#161616] z-10 pr-6 py-3 text-white/50 text-right whitespace-nowrap font-mono-custom text-sm font-bold" title={row}>
                       {row}
                     </td>
                     {columns.map(col => {
@@ -170,7 +172,7 @@ export default function AnalysisPage() {
                       return (
                         <td
                           key={col}
-                          className={`w-20 h-20 text-center font-mono-custom text-sm font-black rounded-xl transition-all hover:scale-110 cursor-default shadow-xl ${getCellColor(val)} ${isSelf ? "opacity-20" : "opacity-100"}`}
+                          className={`w-16 h-16 text-center font-mono-custom text-xs font-bold rounded-lg transition-all hover:scale-110 cursor-default shadow-inner ${getCellColor(val)} ${isSelf ? "opacity-20" : "opacity-100"}`}
                         >
                           {val.toFixed(2)}
                         </td>
@@ -204,28 +206,28 @@ export default function AnalysisPage() {
 
     return (
       <div className="animate-fade-up">
-        <p className="text-white/40 text-sm mb-10 font-mono-custom uppercase tracking-widest font-bold">K-Means · k={bestK} · Automated Analysis</p>
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-10">
+        <p className="text-white/40 text-xs mb-8 font-mono-custom uppercase tracking-widest">K-Means · k={bestK} · Automated Selection</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
           {clusters.map((cluster, i) => {
             const color = CLUSTER_COLORS[i] ?? CLUSTER_COLORS[0]
             const pct = Math.round((cluster.size / totalRows) * 100)
             return (
-              <div key={cluster.id} className={`bg-white/5 rounded-3xl p-10 border-l-8 ${color.border} hover:bg-white/[0.08] transition-all shadow-2xl hover:scale-[1.02]`}>
-                <div className="flex justify-between items-start mb-10">
+              <div key={cluster.id} className={`bg-white/5 rounded-2xl p-8 border-l-4 ${color.border} hover:bg-white/[0.08] transition-colors shadow-xl`}>
+                <div className="flex justify-between items-start mb-8">
                   <div>
-                    <h3 className={`font-display font-black text-4xl ${color.text}`}>Segment {String.fromCharCode(65 + i)}</h3>
-                    <p className="text-white/50 text-base font-mono-custom mt-2 font-bold">{cluster.size} rows · {pct}% total</p>
+                    <h3 className={`font-display font-black text-3xl ${color.text}`}>Segment {String.fromCharCode(65 + i)}</h3>
+                    <p className="text-white/40 text-sm font-mono-custom mt-1">{cluster.size} rows · {pct}% of dataset</p>
                   </div>
                 </div>
-                <div className="space-y-8">
+                <div className="space-y-6">
                   {cluster.stats.numeric && (
                     <div>
-                      <p className="text-sm text-white/30 tracking-widest font-mono-custom uppercase mb-4 font-black">Averages</p>
-                      <div className="space-y-3">
+                      <p className="text-xs text-white/20 tracking-widest font-mono-custom uppercase mb-3">Averages</p>
+                      <div className="space-y-2">
                         {Object.entries(cluster.stats.numeric).map(([col, val]) => (
-                          <div key={col} className="flex justify-between text-base">
-                            <span className="text-white/60 font-medium">{col}</span>
-                            <span className="font-mono-custom text-amber-400 font-black">{val?.toFixed ? val.toFixed(2) : val}</span>
+                          <div key={col} className="flex justify-between text-sm">
+                            <span className="text-white/50">{col}</span>
+                            <span className="font-mono-custom text-amber-400 font-bold">{val?.toFixed ? val.toFixed(2) : val}</span>
                           </div>
                         ))}
                       </div>
@@ -233,12 +235,12 @@ export default function AnalysisPage() {
                   )}
                   {cluster.stats.categorical && (
                     <div>
-                      <p className="text-sm text-white/30 tracking-widest font-mono-custom uppercase mb-4 font-black">Dominant Features</p>
-                      <div className="space-y-3">
+                      <p className="text-xs text-white/20 tracking-widest font-mono-custom uppercase mb-3">Dominant</p>
+                      <div className="space-y-2">
                         {Object.entries(cluster.stats.categorical).map(([col, val]) => (
-                          <div key={col} className="flex justify-between text-base">
-                            <span className="text-white/60 font-medium">{col}</span>
-                            <span className="font-mono-custom text-green-400 font-black">{val}</span>
+                          <div key={col} className="flex justify-between text-sm">
+                            <span className="text-white/50">{col}</span>
+                            <span className="font-mono-custom text-green-400 font-bold">{val}</span>
                           </div>
                         ))}
                       </div>
@@ -258,6 +260,7 @@ export default function AnalysisPage() {
       
       <div className="space-y-24">
         
+        {/* SECTION: PROFILE */}
         <section id="profile">
           <div className="flex items-center gap-3 mb-8">
             <span className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-display font-bold">◈</span>
@@ -266,6 +269,7 @@ export default function AnalysisPage() {
           {renderProfile()}
         </section>
 
+        {/* SECTION: PATTERNS */}
         <section id="patterns" className="pt-12 border-t border-white/5">
           <div className="flex items-center gap-3 mb-8">
             <span className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-display font-bold">◎</span>
@@ -274,6 +278,7 @@ export default function AnalysisPage() {
           {renderPatterns()}
         </section>
 
+        {/* SECTION: SEGMENTS */}
         <section id="segments" className="pt-12 border-t border-white/5">
           <div className="flex items-center gap-3 mb-8">
             <span className="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-display font-bold">⬡</span>
