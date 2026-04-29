@@ -6,17 +6,17 @@ DataDecoder is a full-stack web application for automated data analysis and expl
 
 ## Features
 
-**Dataset Upload** — CSV file upload with automated validation and preview.
+**Dataset Upload** - CSV file upload with automated validation and preview.
 
-**Data Profiling** — Per-column statistical summaries: types, min/max, mean, mode, and null rates.
+**Data Profiling** - Per-column statistical summaries: types, min/max, mean, mode, and null rates.
 
-**Correlation Analysis** — Pearson and Spearman heatmaps. Set a target column to unlock Random Forest feature importance.
+**Correlation Analysis** - Pearson and Spearman heatmaps. Set a target column to unlock Random Forest feature importance.
 
-**K-Means Clustering** — Automatically selects the best k via silhouette score. Skips clustering when no meaningful structure is found.
+**K-Means Clustering** - Automatically selects the best k via silhouette score. Skips clustering when no meaningful structure is found.
 
-**AI Narrative** — An LLM reads your analysis results and writes a structured, plain-English report.
+**AI Narrative** - An LLM reads your analysis results and writes a structured, plain-English report.
 
-**PDF Export** — Download the AI-generated report as a formatted PDF.
+**PDF Export** - Download the AI-generated report as a formatted PDF.
 
 ---
 
@@ -24,19 +24,19 @@ DataDecoder is a full-stack web application for automated data analysis and expl
 
 ### Frontend
 
-- **React 19** — UI framework
-- **Tailwind CSS 4** — Styling
-- **React Router** — Client-side routing
-- **Axios** — HTTP client
-- **ReactMarkdown** — Rendering AI-generated markdown
+- **React 19** - UI framework
+- **Tailwind CSS 4** - Styling
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
+- **ReactMarkdown** - Rendering AI-generated markdown
 
 ### Backend
 
-- **FastAPI** — API framework
-- **Pandas / NumPy** — Data manipulation
-- **Scikit-learn** — Correlation, clustering, and feature importance
-- **ReportLab** — PDF generation
-- **Python-dotenv** — Environment variable management
+- **FastAPI** - API framework
+- **Pandas / NumPy** - Data manipulation
+- **Scikit-learn** - Correlation, clustering, and feature importance
+- **ReportLab** - PDF generation
+- **Python-dotenv** - Environment variable management
 
 ---
 
@@ -81,17 +81,17 @@ The app will be available at `http://localhost:5173`.
 
 All endpoints accept and return JSON unless otherwise noted.
 
-**POST `/api/upload`** — Upload a CSV file. Returns a session ID, column names, row count, and a 5-row preview.
+**POST `/api/upload`** - Upload a CSV file. Returns a session ID, column names, row count, and a 5-row preview.
 
-**POST `/api/profile`** — Run column-level statistical profiling for the given session.
+**POST `/api/profile`** - Run column-level statistical profiling for the given session.
 
-**POST `/api/correlation`** — Compute Pearson and Spearman correlation matrices. Pass a `target` field to also return Random Forest feature importance.
+**POST `/api/correlation`** - Compute Pearson and Spearman correlation matrices. Pass a `target` field to also return Random Forest feature importance.
 
-**POST `/api/clustering`** — Run K-Means clustering with automatic k selection via silhouette score.
+**POST `/api/clustering`** - Run K-Means clustering with automatic k selection via silhouette score.
 
-**POST `/api/explain`** — Build a prompt from all analysis results and return an LLM-generated narrative.
+**POST `/api/explain`** - Build a prompt from all analysis results and return an LLM-generated narrative.
 
-**POST `/api/report`** — Generate and return the AI narrative as a downloadable PDF.
+**POST `/api/report`** - Generate and return the AI narrative as a downloadable PDF.
 
 ---
 
@@ -110,9 +110,9 @@ Upload CSV
 
 ## Environment Variables
 
-**`OPENROUTER_API_KEY`** — API key for OpenRouter, used by the AI service.
+**`OPENROUTER_API_KEY`** - API key for OpenRouter, used by the AI service.
 
-**`VITE_API_URL`** — Backend base URL consumed by the frontend. Defaults to `http://localhost:8000/api` if not set.
+**`VITE_API_URL`** - Backend base URL consumed by the frontend. Defaults to `http://localhost:8000/api` if not set.
 
 ---
 
