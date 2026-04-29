@@ -16,7 +16,7 @@ def call_ai(prompt):
             "Content-Type": "application/json",
         },
         json={
-            "model": "google/gemma-3-12b-it:free",
+            "model": "openai/gpt-4o-mini",
             "messages": [
                 {"role": "user", "content": prompt}
             ]
